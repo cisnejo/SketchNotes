@@ -16,6 +16,7 @@ function spawnThings() {
 
   let strokes = JSON.parse(localStorage.getItem('strokes')) || [];
 
+
   const controlContainer = createControlContainer()
 
   const save_btn = createButton("save-btn", "Save", controlContainer)
@@ -28,12 +29,15 @@ function spawnThings() {
   const clearButton = createClearBtn(context, strokes)
   cavnasProc(canvas, context, strokes)
 
-  controlContainer.appendChild(save_btn)
-  controlContainer.appendChild(load_btn)
-  controlContainer.appendChild(clearButton)
-  controlContainer.appendChild(toggle_canvas_btn)
 
-  styleControlButtons(controlContainer);
+
+  const btnControlContainer = controlContainer.querySelector('#sketch-ctrl-container')
+  btnControlContainer.appendChild(save_btn)
+  btnControlContainer.appendChild(load_btn)
+  btnControlContainer.appendChild(clearButton)
+  btnControlContainer.appendChild(toggle_canvas_btn)
+
+  styleControlButtons(controlContainer, textStyes);
 
   controlContainer.style.zIndex = "3000"
   canvas.style.zIndex = "2000"
@@ -42,15 +46,21 @@ function spawnThings() {
   document.body.appendChild(controlContainer)
 
   function createControlContainer() {
-    const div = document.createElement("div")
-    div.id = "sketch-ctrl-container"
-    styleControllerContainer(div)
-    div.addEventListener('mousedown', dragStart)
+    const container = document.createElement('div')
+    const btnContainer = document.createElement("div")
+    const logo = document.createElement('div')
+    logo.innerText = 'sketch notes'
+    btnContainer.id = "sketch-ctrl-container"
+    styleLogo(logo, textStyes)
+    styleControllerContainer(container)
+    container.appendChild(logo)
+    container.appendChild(btnContainer)
+    container.addEventListener('mousedown', dragStart)
 
     function dragStart(event) {
       isDragging = true;
-      dragX = event.clientX - div.offsetLeft;
-      dragY = event.clientY - div.offsetTop;
+      dragX = event.clientX - container.offsetLeft;
+      dragY = event.clientY - container.offsetTop;
 
       document.addEventListener("mousemove", drag);
       document.addEventListener("mouseup", dragEnd);
@@ -59,8 +69,8 @@ function spawnThings() {
 
     function drag(event) {
       if (isDragging) {
-        div.style.left = event.clientX - dragX + "px";
-        div.style.top = event.clientY - dragY + "px";
+        container.style.left = event.clientX - dragX + "px";
+        container.style.top = event.clientY - dragY + "px";
       }
     }
 
@@ -70,7 +80,7 @@ function spawnThings() {
       document.removeEventListener("mousemove", drag);
       document.removeEventListener("mouseup", dragEnd);
     }
-    return div
+    return container
   }
 
 
