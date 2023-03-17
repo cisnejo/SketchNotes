@@ -5,7 +5,7 @@ Chrome extension for drawing and taking notes on any page. Inspired by Excalidra
 ``` git  clone this repo ```
 ### Enable in Chrome Dev Tools
 - Chrome Settings
-- more tools ...
+- 'More tools' > 'Extensions'
 - Enable 'Developer mode' slider in the top right
 - Click 'Load Unpacked' in the top left corner
 - Navigate to cloned repo folder and select it
