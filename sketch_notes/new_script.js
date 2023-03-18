@@ -1,7 +1,7 @@
 function styleCanvas(canvas) {
     canvas.style.display = 'none'
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = document.body.getBoundingClientRect().width
+    canvas.height =  document.body.getBoundingClientRect().height
     canvas.style.left = '0'
     canvas.style.top = '0'
     canvas.style.margin = '0'
