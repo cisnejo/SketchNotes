@@ -9,14 +9,20 @@ function styleCanvas(canvas) {
         width: document.body.offsetWidth,
         height: document.body.offsetHeight
     })
+    const canvas_stlyes = {
+        left: "0",
+        top: "0",
+        margin: "0",
+        padding: "0",
+        position: "absolute",
 
+    }
+    Object.assign(canvas.style, canvas_stlyes)
+    
     canvas.width = largestElement.width
     canvas.height = largestElement.height
-    canvas.style.left = '0'
-    canvas.style.top = '0'
-    canvas.style.margin = '0'
-    canvas.style.padding = '0'
-    canvas.style.position = "absolute"
+
+   
 }
 
 function styleControlButtons(controlContainer, styles = null) {

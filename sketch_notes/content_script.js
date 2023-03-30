@@ -1,5 +1,3 @@
-
-
 window.onload = function () {
   spawnThings()
   const color_picker = document.createElement('input')
