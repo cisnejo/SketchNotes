@@ -139,7 +139,7 @@ function cavnasProc(canvas, context, strokes) {
   canvas.addEventListener('mousedown', function (e) {
     isDrawing = true;
 
-    lastX = e.pageX  - canvas.offsetLeft  ;
+    lastX = e.pageX - canvas.offsetLeft;
     lastY = e.pageY - canvas.offsetTop;
 
 
@@ -150,8 +150,6 @@ function cavnasProc(canvas, context, strokes) {
     if (isDrawing) {
       var currentX = e.pageX - canvas.offsetLeft;
       var currentY = e.pageY - canvas.offsetTop;
-      console.log(e)
-
       drawLine(lastX, lastY, currentX, currentY, strokeColor, width);
       local_strokes.push({
         startX: lastX,

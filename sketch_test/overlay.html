@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+
+    body {
+      width: 100%;
+      height: 100%;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      margin: 0;
+      padding: 0;
+      background-color: aqua;
+    }
+
+    #edit-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      pointer-events: auto;
+    }
+
+    #sketch-notes-container[data-visible="false"] {
+      display: none;
+    }
+
+    #sketch-notes-container[data-visible="true"] {
+      display: inline-block;
+    }
+    #toggle-btn[data-togglestate="off"] {
+      background-color: RGB(240, 240, 240);
+      color: black;
+    }
+    #toggle-btn[data-togglestate="on"] {
+      background-color: RGB(0, 0, 0);
+      color: RGB(240, 240, 240);
+    }
+  </style>
+  <body>
+    <div id="edit-container">
+      <p>sketch notes</p>
+      <ul>
+        <li><button id="save-btn">Save</button></li>
+        <li><button id="load-btn">Load</button></li>
+        <li><button id="clr-btn">Clear Notes</button></li>
+        <li>
+          <button id="toggle-btn" data-togglestate="off">Toggle Sketch</button>
+        </li>
+      </ul>
+    </div>
+    <!-- width/height needs to be set explicitly canvas  element, not in CSS -->
+    <div id="sketch-notes-container" data-visible="false">
+      <canvas id="sketch-canvas"> </canvas>
+    </div>
+  </body>
+
+  <script type="module" src="content.js"></script>
+</html>
