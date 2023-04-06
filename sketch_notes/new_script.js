@@ -18,11 +18,11 @@ function styleCanvas(canvas) {
 
     }
     Object.assign(canvas.style, canvas_stlyes)
-    
+
     canvas.width = largestElement.width
     canvas.height = largestElement.height
 
-   
+
 }
 
 function styleControlButtons(controlContainer, styles = null) {
@@ -104,3 +104,47 @@ function handleCanvasToggle(canvasOn, canvas, btn_toggle) {
     canvasOn ? btn_toggle.style.color = "black" : btn_toggle.style.color = 'white'
     return !canvasOn
 }
+
+
+function CreateTextBox() {
+
+    const sketchData = JSON.parse(localStorage.getItem('sketch_data'))
+    const textBoxIndex = sketchData ? sketchData.textBox ? sketchData.textBox.length - 1 : 0 : 0
+    const textBoxContainer = document.createElement('div')
+    const textBoxTitle = document.createElement('p')
+    const textBoxInput = document.createElement('input')
+
+    textBoxTitle = "title"
+
+    textBoxContainer.appendChild(textBoxTitle)
+    textBoxContainer.appendChild(textBoxInput)
+    textBoxContainer.addEventListener('mousedown', (e) => dragStart(e, textBoxContainer))
+    return textBoxContainer
+}
+
+
+function dragStart(event, container) {
+    isDragging = true;
+    dragX = event.clientX - container.offsetLeft;
+    dragY = event.clientY - container.offsetTop;
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", dragEnd);
+    document.addEventListener('mouseleave', dragEnd);
+
+    function drag(event) {
+        if (isDragging) {
+            container.style.left = event.clientX - dragX + "px";
+            container.style.top = event.clientY - dragY + "px";
+        }
+    }
+
+    function dragEnd() {
+        isDragging = false;
+
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("mouseup", dragEnd);
+    }
+
+}
+
