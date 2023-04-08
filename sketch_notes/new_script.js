@@ -18,11 +18,11 @@ function styleCanvas(canvas) {
 
     }
     Object.assign(canvas.style, canvas_stlyes)
-    
+
     canvas.width = largestElement.width
     canvas.height = largestElement.height
 
-   
+
 }
 
 function styleControlButtons(controlContainer, styles = null) {
@@ -103,4 +103,124 @@ function handleCanvasToggle(canvasOn, canvas, btn_toggle) {
     canvasOn ? btn_toggle.style.backgroundColor = 'RGB(240, 240, 240)' : btn_toggle.style.backgroundColor = 'black'
     canvasOn ? btn_toggle.style.color = "black" : btn_toggle.style.color = 'white'
     return !canvasOn
+}
+
+
+function CreateTextBox() {
+
+    const sketchData = JSON.parse(localStorage.getItem('sketch_data'))
+    const textBoxIndex = sketchData ? sketchData.textBoxData ? sketchData.textBoxData.length : 0 : 0
+    const textBoxContainer = document.createElement('div')
+    const textBoxTitle = document.createElement('p')
+    const textBoxInput = document.createElement('input')
+
+    const styles_textBoxContainer = {
+        height: '400px',
+        width: '400px',
+        border: '1px solid black',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'absolute',
+        left: '0',
+        top: '0',
+        backgroundColor: 'RGB(0,0,0)',
+        zIndex: '10000'
+    }
+    const styles_textBoxTitle = {}
+    const styles_textBoxInput = {
+        flex: '1'
+    }
+
+
+    Object.assign(textBoxContainer.style, styles_textBoxContainer)
+    Object.assign(textBoxTitle.style, styles_textBoxTitle)
+    Object.assign(textBoxInput.style, styles_textBoxInput)
+
+    let newBox = true
+
+    textBoxTitle.innerText = "title"
+    textBoxContainer.appendChild(textBoxTitle)
+    textBoxContainer.appendChild(textBoxInput)
+
+
+    textBoxContainer.addEventListener('mousedown', (e) => {
+        dragStart(e, textBoxContainer)
+        newBox = MoveItem(newBox, textBoxContainer, textBoxIndex)
+        
+    })
+
+    return textBoxContainer
+}
+
+
+function dragStart(event, container) {
+    isDragging = true;
+    dragX = event.clientX - container.offsetLeft;
+    dragY = event.clientY - container.offsetTop;
+
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", dragEnd);
+    document.addEventListener('mouseleave', dragEnd);
+
+    function drag(event) {
+        if (isDragging) {
+            container.style.left = event.clientX - dragX + "px";
+            container.style.top = event.clientY - dragY + "px";
+        }
+    }
+
+    function dragEnd() {
+        isDragging = false;
+
+        document.removeEventListener("mousemove", drag);
+        document.removeEventListener("mouseup", dragEnd);
+    }
+
+}
+
+
+function MoveItem(newBox, textBoxContainer, textBoxIndex) {
+ 
+    const styles = window.getComputedStyle(textBoxContainer);
+
+    // create an object to store the styles using reduce
+    // this is currently on mouseDown, needs to be on 'dragEnd' and add event listeners to loading
+    const textBoxProps = Array.from(styles).reduce((acc, propName) => {
+        acc[propName] = styles.getPropertyValue(propName);
+        return acc;
+    }, {});
+
+
+    let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    let currentSketchBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : null
+
+    if (currentSketchBoxData && currentSketchBoxData.length < 1) {
+        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: textBoxProps }] }))
+
+    }
+    else if (currentSketchBoxData && currentSketchBoxData.length >= 1) {
+        if (newBox) {
+            //if not then add it to the list
+            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: textBoxProps }] }))
+    
+        }
+        else if (!newBox) {
+           
+            const newTextBoxData = sketchData.textBoxData.map(textBox => {
+                if (textBox.id == textBoxIndex) textBox.props = textBoxProps
+                return textBox
+            }
+
+         
+            )
+            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
+
+        }
+    }
+    else {
+        localStorage.setItem('sketch_data', JSON.stringify({ textBoxData: [{ id: textBoxIndex, props: textBoxProps }] }))
+       
+    }
+    newBox = false;
+    return newBox
 }

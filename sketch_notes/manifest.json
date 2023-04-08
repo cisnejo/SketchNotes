@@ -4,7 +4,7 @@
   "description": "used for taking notes on page like a whiteboard",
   "manifest_version": 3,
   "author": "Joseph Cisneros",
-  "permissions": ["activeTab", "tabs", "<all_urls>"],
+  "permissions": ["activeTab", "tabs", "<all_urls>","storage"],
 
   "content_scripts": [
     {
