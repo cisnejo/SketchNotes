@@ -54,7 +54,6 @@ chrome.storage.local.get("sketch_data", function (obj) {
 
 function LoadTextBoxes(textBox_data) {
   textBox_data.forEach(textBox => {
-
     const textBoxIndex = textBox.id
     const textBoxContainer = document.createElement('div')
     const textBoxTitle = document.createElement('p')
@@ -65,13 +64,15 @@ function LoadTextBoxes(textBox_data) {
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
-    Object.assign(textBoxContainer.style, textBox.props)
+    Object.assign(textBoxContainer.style, textBox.props.textBoxContainer_props)
+    Object.assign(textBoxTitle.style, textBox.props.textBoxTitle_props)
+    Object.assign(textBoxInput.style, textBox.props.textBoxInput_props)
 
     document.body.appendChild(textBoxContainer)
     let newBox = false
     textBoxContainer.addEventListener('mousedown', (e) => {
       dragStart(e, textBoxContainer)
-      MoveItem(newBox, textBoxContainer, textBoxIndex)
+      MoveItem(newBox,  { textBoxContainer, textBoxTitle, textBoxInput }, textBoxIndex)
     })
   })
 

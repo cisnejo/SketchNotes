@@ -60,7 +60,6 @@ function styleControllerContainer(controllerContainer) {
 function styleBtnContainer(btnContainer) {
     const style = btnContainer.style
     style.display = 'flex'
-
 }
 
 const textStyes = {
@@ -76,8 +75,6 @@ const textStyes = {
 function styleLogo(logo, styles = null) {
     if (styles) {
         Object.assign(logo.style, styles)
-
-
         logo.style.fontSize = '14px'
     }
     else {
@@ -145,8 +142,8 @@ function CreateTextBox() {
 
     textBoxContainer.addEventListener('mousedown', (e) => {
         dragStart(e, textBoxContainer)
-        newBox = MoveItem(newBox, textBoxContainer, textBoxIndex)
-        
+        newBox = MoveItem(newBox, { textBoxContainer, textBoxTitle, textBoxInput }, textBoxIndex)
+
     })
 
     return textBoxContainer
@@ -180,13 +177,23 @@ function dragStart(event, container) {
 
 
 function MoveItem(newBox, textBoxContainer, textBoxIndex) {
- 
-    const styles = window.getComputedStyle(textBoxContainer);
+
+    const textBoxtextBoxContainer_styles = window.getComputedStyle(textBoxContainer.textBoxContainer);
+    const textBoxTitle_styles = window.getComputedStyle(textBoxContainer.textBoxTitle);
+    const textBoxInput_styles = window.getComputedStyle(textBoxContainer.textBoxInput);
 
     // create an object to store the styles using reduce
     // this is currently on mouseDown, needs to be on 'dragEnd' and add event listeners to loading
-    const textBoxProps = Array.from(styles).reduce((acc, propName) => {
-        acc[propName] = styles.getPropertyValue(propName);
+    const textBoxContainer_props = Array.from(textBoxtextBoxContainer_styles).reduce((acc, propName) => {
+        acc[propName] = textBoxtextBoxContainer_styles.getPropertyValue(propName);
+        return acc;
+    }, {});
+    const textBoxTitle_props = Array.from(textBoxTitle_styles).reduce((acc, propName) => {
+        acc[propName] = textBoxTitle_styles.getPropertyValue(propName);
+        return acc;
+    }, {});
+    const textBoxInput_props = Array.from(textBoxInput_styles).reduce((acc, propName) => {
+        acc[propName] = textBoxInput_styles.getPropertyValue(propName);
         return acc;
     }, {});
 
@@ -195,31 +202,31 @@ function MoveItem(newBox, textBoxContainer, textBoxIndex) {
     let currentSketchBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : null
 
     if (currentSketchBoxData && currentSketchBoxData.length < 1) {
-        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: textBoxProps }] }))
+        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props } }] }))
 
     }
     else if (currentSketchBoxData && currentSketchBoxData.length >= 1) {
         if (newBox) {
             //if not then add it to the list
-            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: textBoxProps }] }))
-    
+            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props } }] }))
+
         }
         else if (!newBox) {
-           
+
             const newTextBoxData = sketchData.textBoxData.map(textBox => {
-                if (textBox.id == textBoxIndex) textBox.props = textBoxProps
+                if (textBox.id == textBoxIndex) textBox.props = { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }
                 return textBox
             }
 
-         
+
             )
             localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
 
         }
     }
     else {
-        localStorage.setItem('sketch_data', JSON.stringify({ textBoxData: [{ id: textBoxIndex, props: textBoxProps }] }))
-       
+        localStorage.setItem('sketch_data', JSON.stringify({ textBoxData: [{ id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props } }] }))
+
     }
     newBox = false;
     return newBox
