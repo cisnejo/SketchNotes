@@ -108,8 +108,8 @@ function CreateTextBox() {
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'))
     const textBoxIndex = sketchData ? sketchData.textBoxData ? sketchData.textBoxData.length : 0 : 0
     const textBoxContainer = document.createElement('div')
-    const textBoxTitle = document.createElement('p')
-    const textBoxInput = document.createElement('input')
+    const textBoxTitle = document.createElement('input')
+    const textBoxInput = document.createElement('textarea')
 
     const styles_textBoxContainer = {
         height: '400px',
@@ -135,29 +135,32 @@ function CreateTextBox() {
 
     let newBox = true
 
-    textBoxTitle.innerText = "title"
+    textBoxTitle.value = 'Title'
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
+    const textBoXProps = { textBoxContainer, textBoxTitle, textBoxInput }
 
     textBoxContainer.addEventListener('mousedown', (e) => {
-        dragStart(e, textBoxContainer)
-        newBox = MoveItem(newBox, { textBoxContainer, textBoxTitle, textBoxInput }, textBoxIndex)
+        dragStart(e, textBoxContainer, newBox, textBoXProps, textBoxIndex)
 
     })
+
+    textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
+    textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
 
     return textBoxContainer
 }
 
 
-function dragStart(event, container) {
+function dragStart(event, container, newBox, textBoxObject, textBoxIndex) {
     isDragging = true;
     dragX = event.clientX - container.offsetLeft;
     dragY = event.clientY - container.offsetTop;
 
     document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", dragEnd);
-    document.addEventListener('mouseleave', dragEnd);
+    document.addEventListener("mouseup", () => dragEnd(newBox, textBoxObject, textBoxIndex));
+    document.addEventListener('mouseleave', () => dragEnd(newBox, textBoxObject, textBoxIndex));
 
     function drag(event) {
         if (isDragging) {
@@ -168,7 +171,6 @@ function dragStart(event, container) {
 
     function dragEnd() {
         isDragging = false;
-
         document.removeEventListener("mousemove", drag);
         document.removeEventListener("mouseup", dragEnd);
     }
@@ -176,7 +178,7 @@ function dragStart(event, container) {
 }
 
 
-function MoveItem(newBox, textBoxContainer, textBoxIndex) {
+function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
 
     const textBoxtextBoxContainer_styles = window.getComputedStyle(textBoxContainer.textBoxContainer);
     const textBoxTitle_styles = window.getComputedStyle(textBoxContainer.textBoxTitle);

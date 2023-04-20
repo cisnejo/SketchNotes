@@ -56,8 +56,8 @@ function LoadTextBoxes(textBox_data) {
   textBox_data.forEach(textBox => {
     const textBoxIndex = textBox.id
     const textBoxContainer = document.createElement('div')
-    const textBoxTitle = document.createElement('p')
-    const textBoxInput = document.createElement('input')
+    const textBoxTitle = document.createElement('input')
+    const textBoxInput = document.createElement('textarea')
 
 
     textBoxTitle.innerText = "title"
@@ -72,8 +72,12 @@ function LoadTextBoxes(textBox_data) {
     let newBox = false
     textBoxContainer.addEventListener('mousedown', (e) => {
       dragStart(e, textBoxContainer)
-      MoveItem(newBox,  { textBoxContainer, textBoxTitle, textBoxInput }, textBoxIndex)
+
     })
+
+    const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
+    textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
+    textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
   })
 
 
