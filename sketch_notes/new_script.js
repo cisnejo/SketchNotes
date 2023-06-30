@@ -178,6 +178,14 @@ function dragStart(event, container, newBox, textBoxObject, textBoxIndex) {
 }
 
 
+function GetElementProps(stylesObject) {
+    return Array.from(stylesObject).reduce((acc, propName) => {
+        acc[propName] = stylesObject.getPropertyValue(propName);
+        return acc;
+    }, {});
+
+}
+
 function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
 
     const textBoxtextBoxContainer_styles = window.getComputedStyle(textBoxContainer.textBoxContainer);
@@ -186,18 +194,11 @@ function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
 
     // create an object to store the styles using reduce
     // this is currently on mouseDown, needs to be on 'dragEnd' and add event listeners to loading
-    const textBoxContainer_props = Array.from(textBoxtextBoxContainer_styles).reduce((acc, propName) => {
-        acc[propName] = textBoxtextBoxContainer_styles.getPropertyValue(propName);
-        return acc;
-    }, {});
-    const textBoxTitle_props = Array.from(textBoxTitle_styles).reduce((acc, propName) => {
-        acc[propName] = textBoxTitle_styles.getPropertyValue(propName);
-        return acc;
-    }, {});
-    const textBoxInput_props = Array.from(textBoxInput_styles).reduce((acc, propName) => {
-        acc[propName] = textBoxInput_styles.getPropertyValue(propName);
-        return acc;
-    }, {});
+    const textBoxContainer_props = GetElementProps(textBoxtextBoxContainer_styles)
+    const textBoxTitle_props = GetElementProps(textBoxTitle_styles)
+    const textBoxInput_props = GetElementProps(textBoxInput_styles)
+
+
 
 
     let sketchData = JSON.parse(localStorage.getItem('sketch_data'));

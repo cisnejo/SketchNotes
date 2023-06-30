@@ -258,3 +258,4 @@ function cavnasProc(canvas, context, strokes) {
 
   return strokes
 }
+
