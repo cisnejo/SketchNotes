@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@types/html": "^1.0.1",
     "@types/node": "^18.15.11"
   }
 }

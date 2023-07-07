@@ -4,12 +4,12 @@
   "description": "used for taking notes on page like a whiteboard",
   "manifest_version": 3,
   "author": "Joseph Cisneros",
-  "permissions": ["activeTab", "tabs", "<all_urls>","storage"],
+  "permissions": ["activeTab", "tabs", "<all_urls>", "storage"],
 
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_script.js","new_script.js"]
+      "js": ["content_script.js", "new_script.js", "TextBoxUtils.js"]
     }
   ]
 }
