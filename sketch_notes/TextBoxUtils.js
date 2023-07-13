@@ -25,6 +25,7 @@ function CreateTextBox() {
         flex: '1'
     }
 
+    textBoxContainer.className = 'sketch_textbox'
 
     Object.assign(textBoxContainer.style, styles_textBoxContainer)
     Object.assign(textBoxTitle.style, styles_textBoxTitle)
@@ -55,26 +56,23 @@ function CreateTextBox() {
 // need to update the text Components (input and textarea) with the new values into the local storage
 function UpdateTextBoxData(target, textBoxIndex) {
     const element_lowerCase = target.tagName.toLowerCase()
-    switch (element_lowerCase) {
-        case 'input':
-            console.log('input')
-            break;
-        case 'textarea':
-            console.log('textarea')
-            break;
-        default: console.log('no valid children');
+    if (element_lowerCase === 'input' || element_lowerCase === 'textarea') {
+        const parent = target.parentElement
+        const input = parent.querySelector('input')
+        const textarea = parent.querySelector('textarea')
+        AppendTextBoxData({ input: input.value, textarea: textarea.value }, textBoxIndex)
     }
 }
 
-function AppendTextBoxData(textComponent, textBoxIndex) {
+function AppendTextBoxData(textDataObject, textBoxIndex) {
     let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    console.log(textDataObject)
     const newTextBoxData = sketchData.textBoxData.map(textBox => {
-        if (textBox.id == textBoxIndex) textBox.text = { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }
+        if (textBox.id == textBoxIndex) textBox.text = { input: textDataObject.input, textarea: textDataObject.textarea }
         return textBox
     }
-
-
     )
+
     localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
 }
 
@@ -97,17 +95,20 @@ function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
     let currentSketchBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : null
 
     if (currentSketchBoxData && currentSketchBoxData.length < 1) {
-        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props } }] }))
+        console.log('new')
+        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }, text: { input: "Title", textarea: "" } }] }))
 
     }
     else if (currentSketchBoxData && currentSketchBoxData.length >= 1) {
         if (newBox) {
+            console.log("new but prev data exists")
             //if not then add it to the list
-            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props } }] }))
+            localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }, text: { input: "Title", textarea: "" } }] }))
 
         }
         else if (!newBox) {
 
+            console.log('not new')
             const newTextBoxData = sketchData.textBoxData.map(textBox => {
                 if (textBox.id == textBoxIndex) textBox.props = { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }
                 return textBox

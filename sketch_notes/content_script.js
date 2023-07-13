@@ -60,7 +60,11 @@ function LoadTextBoxes(textBox_data) {
     const textBoxInput = document.createElement('textarea')
 
 
-    textBoxTitle.innerText = "title"
+    textBoxContainer.className = 'sketch_textbox'
+
+    textBoxTitle.value = textBox.text.input
+    textBoxInput.value = textBox.text.textarea
+
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
@@ -76,9 +80,12 @@ function LoadTextBoxes(textBox_data) {
     })
 
     const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
+    textBoxContainer.style.display = 'none'
     textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
+    textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
   })
+
 
 
 }
