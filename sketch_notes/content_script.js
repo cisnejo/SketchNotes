@@ -86,14 +86,16 @@ function spawnThings() {
   // window.addEventListener('resize', resizeCanvas)
   window.addEventListener('scroll', increaseCanvasSize)
   function increaseCanvasSize() {
-    const rect = canvas.getBoundingClientRect();
-
-    const newWidth = rect.left + window.scrollX;
-    const newHeight = rect.top + window.scrollY;
-    console.log(window.scrollY)
     // Set the new canvas dimensions
     canvas.style.top = `${window.scrollY}px`
-    canvas.style.left = `${newWidth}px`
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+
+    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+      stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
+
   }
   // function resizeCanvas() {
   //   canvas.width = window.innerWidth;
@@ -176,7 +178,7 @@ function cavnasProc(canvas, context, strokes) {
   let width = 3;
 
   //Load saved strokes
-  strokes.forEach(stroke => drawLine(stroke.startX, stroke.startY,
+  strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY,
     stroke.endX, stroke.endY, stroke.color, stroke.width))
 
   canvas.addEventListener('mousedown', function (e) {
@@ -192,17 +194,19 @@ function cavnasProc(canvas, context, strokes) {
 
     if (isDrawing) {
       const { scrollX, scrollY } = window
+      const { clientX, clientY } = e
+      var currentX = clientX - canvas.offsetLeft + scrollX;
+      var currentY = clientY - canvas.offsetTop + scrollY;
+      // var currentX = e.pageX - canvas.offsetLeft;
+      // var currentY = e.pageY - canvas.offsetTop;
 
-      var currentX = e.pageX - canvas.offsetLeft;
-      var currentY = e.pageY - canvas.offsetTop;
 
-
-      drawLine(lastX, lastY, currentX, currentY, strokeColor, width);
+      drawLine(context, lastX, lastY, currentX, currentY, strokeColor, width);
       local_strokes.push({
         startX: lastX,
-        startY: lastY,
+        startY: lastY + window.scrollY,
         endX: currentX,
-        endY: currentY,
+        endY: currentY + window.scrollY,
         width: width,
         color: strokeColor
       });
@@ -221,14 +225,7 @@ function cavnasProc(canvas, context, strokes) {
     isDrawing = false;
   });
 
-  function drawLine(startX, startY, endX, endY, color, width) {
-    context.beginPath();
-    context.moveTo(startX, startY);
-    context.lineTo(endX, endY);
-    context.strokeStyle = "black";
-    context.lineWidth = width
-    context.stroke();
-  }
+
 
   function saveStrokes() {
 
@@ -242,3 +239,11 @@ function cavnasProc(canvas, context, strokes) {
   return strokes
 }
 
+function drawLine(context, startX, startY, endX, endY, color, width) {
+  context.beginPath();
+  context.moveTo(startX, startY);
+  context.lineTo(endX, endY);
+  context.strokeStyle = "black";
+  context.lineWidth = width
+  context.stroke();
+}
