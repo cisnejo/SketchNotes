@@ -1,24 +1,4 @@
 
-/* ---------- chrome API for get and set storage sync ------------
-
-GET
-chrome.storage.sync.get("myKey", function (obj) {
-  console.log(obj);
-});
-
-SET
-chrome.storage.sync.set({"myKey": testPrefs})
-
-*/
-
-
-/* -----SCHEMA -------- */
-
-/* 
-  {
-    strokes:[],boxes:[]...
-  }
-*/
 window.onload = function () {
   spawnThings()
   // chrome.storage.local.clear()
@@ -27,30 +7,6 @@ window.onload = function () {
   color_picker.type = "color"
   color_picker.value = "#00000"
 }
-// checkLocalStorage(window.location.href)
-
-
-
-
-/* sapwn in the control container and canvas 
-    this should also be within a div*/
-/* ---- Maybe use this later maybe not( chrome API for storage)
-function spawnThings() {
-
-chrome.storage.local.get("sketch_data", function (obj) {
-
-  let strokes = obj.sketch_data ? obj.sketch_data.strokes ? obj.sketch_data.strokes : [] : []
-  console.log(obj)
-
-  cavnasProc(canvas, context, strokes)
-
-  var dataSize = JSON.stringify(obj.sketch_data).length;
-  //console.log('Size of myItem: ' + dataSize/1000 + ' kbytes');
-
-});
-*/
-
-
 
 function LoadTextBoxes(textBox_data) {
   textBox_data.forEach(textBox => {
@@ -85,8 +41,6 @@ function LoadTextBoxes(textBox_data) {
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
     textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
   })
-
-
 
 }
 
@@ -128,7 +82,25 @@ function spawnThings() {
   document.body.appendChild(canvas)
   document.body.appendChild(controlContainer)
 
+  // event listener to resize canvas on window resize
+  // window.addEventListener('resize', resizeCanvas)
+  window.addEventListener('scroll', increaseCanvasSize)
+  function increaseCanvasSize() {
+    const rect = canvas.getBoundingClientRect();
+
+    const newWidth = rect.left + window.scrollX;
+    const newHeight = rect.top + window.scrollY;
+    console.log(window.scrollY)
+    // Set the new canvas dimensions
+    canvas.style.top = `${window.scrollY}px`
+    canvas.style.left = `${newWidth}px`
+  }
+  // function resizeCanvas() {
+  //   canvas.width = window.innerWidth;
+  //   canvas.height = window.innerHeight;
+  // }
 }
+
 function CreateSketchContainer() {
   const sketchContainer = document.createElement("div")
   const styles_sketchContainer = {
@@ -219,8 +191,12 @@ function cavnasProc(canvas, context, strokes) {
   canvas.addEventListener('mousemove', function (e) {
 
     if (isDrawing) {
+      const { scrollX, scrollY } = window
+
       var currentX = e.pageX - canvas.offsetLeft;
       var currentY = e.pageY - canvas.offsetTop;
+
+
       drawLine(lastX, lastY, currentX, currentY, strokeColor, width);
       local_strokes.push({
         startX: lastX,

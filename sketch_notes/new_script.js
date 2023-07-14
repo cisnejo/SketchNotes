@@ -20,8 +20,10 @@ function styleCanvas(canvas) {
     }
     Object.assign(canvas.style, canvas_stlyes)
 
-    canvas.width = largestElement.width
-    canvas.height = largestElement.height
+    //canvas.width = largestElement.width
+    // canvas.height = largestElement.height
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
 
 }

@@ -104,11 +104,8 @@ function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
             console.log("new but prev data exists")
             //if not then add it to the list
             localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }, text: { input: "Title", textarea: "" } }] }))
-
         }
         else if (!newBox) {
-
-            console.log('not new')
             const newTextBoxData = sketchData.textBoxData.map(textBox => {
                 if (textBox.id == textBoxIndex) textBox.props = { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }
                 return textBox
