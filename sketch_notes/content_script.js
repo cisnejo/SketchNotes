@@ -240,10 +240,14 @@ function cavnasProc(canvas, context, strokes) {
 }
 
 function drawLine(context, startX, startY, endX, endY, color, width) {
-  context.beginPath();
-  context.moveTo(startX, startY);
-  context.lineTo(endX, endY);
-  context.strokeStyle = "black";
-  context.lineWidth = width
-  context.stroke();
+  // only draw if in view of the user
+  if (startY > 0 && endY > 0 && startY < window.innerHeight && endY < window.innerHeight) {
+    context.beginPath();
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.strokeStyle = "black";
+    context.lineWidth = width
+    context.stroke();
+  }
+
 }
