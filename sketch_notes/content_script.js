@@ -11,29 +11,44 @@ window.onload = function () {
 function LoadTextBoxes(textBox_data) {
   textBox_data.forEach(textBox => {
     const textBoxIndex = textBox.id
+    const draggableArea = document.createElement('div')
     const textBoxContainer = document.createElement('div')
     const textBoxTitle = document.createElement('input')
     const textBoxInput = document.createElement('textarea')
 
 
+    draggableArea.dataset.draggable = 'true'
+
     textBoxContainer.className = 'sketch_textbox'
+
+    const styles_draggableArea = {
+      height: '20px',
+      width: '100%',
+      left: '0',
+      top: '-20px',
+      backgroundColor: 'black',
+    }
+
+
+
+    textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
+    textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
 
     textBoxTitle.value = textBox.text.input
     textBoxInput.value = textBox.text.textarea
 
+    textBoxContainer.appendChild(draggableArea)
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
     Object.assign(textBoxContainer.style, textBox.props.textBoxContainer_props)
     Object.assign(textBoxTitle.style, textBox.props.textBoxTitle_props)
     Object.assign(textBoxInput.style, textBox.props.textBoxInput_props)
+    Object.assign(draggableArea.style, styles_draggableArea)
 
     document.body.appendChild(textBoxContainer)
     let newBox = false
-    textBoxContainer.addEventListener('mousedown', (e) => {
-      dragStart(e, textBoxContainer)
-
-    })
+    //textBoxContainer.addEventListener('mousedown', (e) => {dragStart(e, textBoxContainer)})
 
     const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
     textBoxContainer.style.display = 'none'
@@ -76,8 +91,8 @@ function spawnThings() {
 
   styleControlButtons(controlContainer, textStyes);
 
-  controlContainer.style.zIndex = "3000"
-  canvas.style.zIndex = "2000"
+  controlContainer.style.zIndex = "200000"
+  canvas.style.zIndex = "100000"
 
   document.body.appendChild(canvas)
   document.body.appendChild(controlContainer)
@@ -95,6 +110,14 @@ function spawnThings() {
 
     strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
+
+    // for control container
+    if (controlContainer.offsetTop < window.scrollY) {
+      controlContainer.style.top = `${window.scrollY}px`
+    }
+    if (controlContainer.offsetTop + controlContainer.getBoundingClientRect().height > window.innerHeight + window.scrollY) {
+      controlContainer.style.top = `${window.scrollY + window.innerHeight - controlContainer.getBoundingClientRect().height}px`
+    }
 
   }
   // function resizeCanvas() {
@@ -125,7 +148,8 @@ function createControlContainer() {
   styleControllerContainer(container)
   container.appendChild(logo)
   container.appendChild(btnContainer)
-  container.addEventListener('mousedown', (e) => dragStart(e, container))
+  logo.dataset.draggable = 'true'
+  //container.addEventListener('mousedown', (e) => dragStart(e, container))
   return container
 }
 

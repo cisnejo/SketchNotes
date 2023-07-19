@@ -5,24 +5,49 @@ function CreateTextBox() {
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'))
     const textBoxIndex = sketchData ? sketchData.textBoxData ? sketchData.textBoxData.length : 0 : 0
     const textBoxContainer = document.createElement('div')
+    const draggableArea = document.createElement('div')
     const textBoxTitle = document.createElement('input')
     const textBoxInput = document.createElement('textarea')
 
+    draggableArea.dataset.draggable = 'true'
+
+    textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
+    textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
+
+    const styles_draggableArea = {
+        height: '20px',
+        width: '100%',
+        left: '0',
+        top: '-20px',
+        backgroundColor: 'black',
+    }
     const styles_textBoxContainer = {
-        height: '400px',
-        width: '400px',
-        border: '1px solid black',
+        height: '200px',
+        width: '200px',
+        border: 'none',
         display: 'flex',
+        alignItems: 'center',
         flexDirection: 'column',
         position: 'absolute',
         left: '0',
         top: '0',
-        backgroundColor: 'RGB(0,0,0)',
-        zIndex: '10000'
+        backgroundColor: 'RGB(255,255,255)',
+        zIndex: '300000',
+        paddingBottom: '5px'
     }
-    const styles_textBoxTitle = {}
+    const styles_textBoxTitle = {
+        border: 'none',
+        height: '50px',
+        width: '90%',
+        fontSize: '20px',
+        border: 'none',
+        paddingBottom: '5px'
+    }
     const styles_textBoxInput = {
-        flex: '1'
+        flex: '1',
+        border: 'none',
+        width: '90%',
+        paddingBottom: '5px',
     }
 
     textBoxContainer.className = 'sketch_textbox'
@@ -30,19 +55,22 @@ function CreateTextBox() {
     Object.assign(textBoxContainer.style, styles_textBoxContainer)
     Object.assign(textBoxTitle.style, styles_textBoxTitle)
     Object.assign(textBoxInput.style, styles_textBoxInput)
+    Object.assign(draggableArea.style, styles_draggableArea)
 
     let newBox = true
 
     textBoxTitle.value = 'Title'
+    textBoxContainer.appendChild(draggableArea)
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
+
     const textBoXProps = { textBoxContainer, textBoxTitle, textBoxInput }
 
-    textBoxContainer.addEventListener('mousedown', (e) => {
-        dragStart(e, textBoxContainer, newBox, textBoXProps, textBoxIndex)
+    // draggableArea.addEventListener('mousedown', (e) => {
+    //     dragStart(e, textBoxContainer, newBox, textBoXProps, textBoxIndex)
 
-    })
+    // })
 
 
 
