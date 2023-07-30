@@ -1,4 +1,7 @@
-
+let canvasOn = false
+const canvasZindex = 100000
+const controlBoxZindex = canvasZindex + 1
+const textboxZindex = controlBoxZindex + 1
 window.onload = function () {
   spawnThings()
   // chrome.storage.local.clear()
@@ -70,7 +73,7 @@ function spawnThings() {
   const controlContainer = createControlContainer()
 
   const create_textBox_btn = createButton("create-text-btn", "Spawn Textbox", controlContainer)
-  const load_btn = createButton("load-btn", "Load", controlContainer)
+  //const load_btn = createButton("load-btn", "Load", controlContainer)
   const canvas = createCanvas();
   const toggle_canvas_btn = createCanvasToggle(canvas)
   const context = canvas.getContext('2d')
@@ -79,27 +82,35 @@ function spawnThings() {
   const clearButton = createClearBtn(canvas, context)
 
   // need to make textbox spawn at the current viewport top-left
-  create_textBox_btn.addEventListener('click', () => {
-    document.body.appendChild(CreateTextBox())
-  })
+  create_textBox_btn.addEventListener('click', () => document.body.appendChild(CreateTextBox(canvasOn)))
 
   const btnControlContainer = controlContainer.querySelector('#sketch-ctrl-container')
   btnControlContainer.appendChild(create_textBox_btn)
-  btnControlContainer.appendChild(load_btn)
+  //btnControlContainer.appendChild(load_btn)
   btnControlContainer.appendChild(clearButton)
   btnControlContainer.appendChild(toggle_canvas_btn)
 
   styleControlButtons(controlContainer, textStyes);
 
-  controlContainer.style.zIndex = "200000"
-  canvas.style.zIndex = "100000"
+  controlContainer.style.zIndex = `${controlBoxZindex}`
+  canvas.style.zIndex = `${canvasZindex}`
 
   document.body.appendChild(canvas)
   document.body.appendChild(controlContainer)
 
-  // event listener to resize canvas on window resize
-  // window.addEventListener('resize', resizeCanvas)
   window.addEventListener('scroll', increaseCanvasSize)
+  window.addEventListener('resize', resizeCanvas)
+  function resizeCanvas() {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+
+    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+      stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
+
+  }
   function increaseCanvasSize() {
     // Set the new canvas dimensions
     canvas.style.top = `${window.scrollY}px`
@@ -118,12 +129,7 @@ function spawnThings() {
     if (controlContainer.offsetTop + controlContainer.getBoundingClientRect().height > window.innerHeight + window.scrollY) {
       controlContainer.style.top = `${window.scrollY + window.innerHeight - controlContainer.getBoundingClientRect().height}px`
     }
-
   }
-  // function resizeCanvas() {
-  //   canvas.width = window.innerWidth;
-  //   canvas.height = window.innerHeight;
-  // }
 }
 
 function CreateSketchContainer() {
@@ -149,7 +155,6 @@ function createControlContainer() {
   container.appendChild(logo)
   container.appendChild(btnContainer)
   logo.dataset.draggable = 'true'
-  //container.addEventListener('mousedown', (e) => dragStart(e, container))
   return container
 }
 
@@ -173,6 +178,7 @@ function createClearBtn(canvas, context) {
   button.innerText = "clear Notes"
   button.addEventListener('click', () => {
     localStorage.setItem('sketch_data', JSON.stringify([]))
+    document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())
     context.clearRect(0, 0, canvas.width, canvas.height)
   })
   return button
@@ -182,15 +188,11 @@ function createCanvasToggle(canvas) {
   const button = document.createElement('button')
   button.id = 'toggle-canvas-btn'
   button.innerText = 'Toggle Sketch'
-  let canvasOn = false
   button.addEventListener('click', () => {
-    canvasOn = handleCanvasToggle(canvasOn, canvas, button)
+    canvasOn = handleCanvasToggle(canvas, button)
   })
   return button
 }
-
-
-
 
 function cavnasProc(canvas, context, strokes) {
 
@@ -221,9 +223,6 @@ function cavnasProc(canvas, context, strokes) {
       const { clientX, clientY } = e
       var currentX = clientX - canvas.offsetLeft + scrollX;
       var currentY = clientY - canvas.offsetTop + scrollY;
-      // var currentX = e.pageX - canvas.offsetLeft;
-      // var currentY = e.pageY - canvas.offsetTop;
-
 
       drawLine(context, lastX, lastY, currentX, currentY, strokeColor, width);
       local_strokes.push({

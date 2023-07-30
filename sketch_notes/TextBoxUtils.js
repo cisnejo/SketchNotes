@@ -1,7 +1,6 @@
 const validTextBoxChildren = ['input', 'textarea']
 
 function CreateTextBox() {
-
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'))
     const textBoxIndex = sketchData ? sketchData.textBoxData ? sketchData.textBoxData.length : 0 : 0
     const textBoxContainer = document.createElement('div')
@@ -25,14 +24,14 @@ function CreateTextBox() {
         height: '200px',
         width: '200px',
         border: 'none',
-        display: 'flex',
+        display: canvasOn ? 'flex' : 'none',
         alignItems: 'center',
         flexDirection: 'column',
         position: 'absolute',
         left: '0',
         top: '0',
-        backgroundColor: 'RGB(255,255,255)',
-        zIndex: '300000',
+        backgroundColor: 'RGB(245, 245, 66)',
+        zIndex: `${textboxZindex}`,
         paddingBottom: '5px'
     }
     const styles_textBoxTitle = {
@@ -41,13 +40,17 @@ function CreateTextBox() {
         width: '90%',
         fontSize: '20px',
         border: 'none',
-        paddingBottom: '5px'
+        paddingBottom: '5px',
+        backgroundColor: 'rgba(0,0,0,0)',
+
     }
     const styles_textBoxInput = {
         flex: '1',
         border: 'none',
         width: '90%',
         paddingBottom: '5px',
+        backgroundColor: 'rgba(0,0,0,0)',
+
     }
 
     textBoxContainer.className = 'sketch_textbox'
@@ -64,16 +67,7 @@ function CreateTextBox() {
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
 
-
     const textBoXProps = { textBoxContainer, textBoxTitle, textBoxInput }
-
-    // draggableArea.addEventListener('mousedown', (e) => {
-    //     dragStart(e, textBoxContainer, newBox, textBoXProps, textBoxIndex)
-
-    // })
-
-
-
     textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
     textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
@@ -94,7 +88,7 @@ function UpdateTextBoxData(target, textBoxIndex) {
 
 function AppendTextBoxData(textDataObject, textBoxIndex) {
     let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    console.log(textDataObject)
+
     const newTextBoxData = sketchData.textBoxData.map(textBox => {
         if (textBox.id == textBoxIndex) textBox.text = { input: textDataObject.input, textarea: textDataObject.textarea }
         return textBox
@@ -123,13 +117,13 @@ function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
     let currentSketchBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : null
 
     if (currentSketchBoxData && currentSketchBoxData.length < 1) {
-        console.log('new')
+
         localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [{ id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }, text: { input: "Title", textarea: "" } }] }))
 
     }
     else if (currentSketchBoxData && currentSketchBoxData.length >= 1) {
         if (newBox) {
-            console.log("new but prev data exists")
+
             //if not then add it to the list
             localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: [...sketchData.textBoxData, { id: textBoxIndex, props: { textBoxContainer_props, textBoxTitle_props, textBoxInput_props }, text: { input: "Title", textarea: "" } }] }))
         }

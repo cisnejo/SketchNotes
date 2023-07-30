@@ -19,9 +19,6 @@ function styleCanvas(canvas) {
         position: "absolute",
     }
     Object.assign(canvas.style, canvas_stlyes)
-
-    //canvas.width = largestElement.width
-    // canvas.height = largestElement.height
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
@@ -97,7 +94,7 @@ function styleLogo(logo, styles = null) {
 
 }
 
-function handleCanvasToggle(canvasOn, canvas, btn_toggle) {
+function handleCanvasToggle(canvas, btn_toggle) {
 
     canvasOn ? canvas.style.display = "none" : canvas.style.display = 'block'
     canvasOn ? btn_toggle.style.backgroundColor = 'RGB(240, 240, 240)' : btn_toggle.style.backgroundColor = 'black'
@@ -116,14 +113,13 @@ function handleCanvasToggle(canvasOn, canvas, btn_toggle) {
 
 window.addEventListener('mousedown', (e) => {
     const { target } = e
+    const isDraggable = e.target.getAttribute('data-draggable')
+
+    if (!target.parentElement) return
+    if (!isDraggable) return
+
     const parent = target.parentElement
     const { offsetLeft, offsetTop } = parent
-
-    const isDraggable = e.target.getAttribute('data-draggable')
-    if (!isDraggable) {
-        return
-    }
-
     let { clientX, clientY } = e
 
     window.addEventListener('mousemove', drag)
@@ -141,37 +137,12 @@ window.addEventListener('mousedown', (e) => {
         window.removeEventListener('mouseup', removeListeners)
     }
 })
-// function dragStart(event, container, newBox, textBoxObject, textBoxIndex) {
-//     isDragging = true;
-//     dragX = event.clientX - container.offsetLeft;
-//     dragY = event.clientY - container.offsetTop;
-
-//     document.addEventListener("mousemove", drag);
-//     document.addEventListener("mouseup", () => dragEnd(newBox, textBoxObject, textBoxIndex));
-//     document.addEventListener('mouseleave', () => dragEnd(newBox, textBoxObject, textBoxIndex));
-
-//     function drag(event) {
-//         if (isDragging) {
-//             container.style.left = event.clientX - dragX + "px";
-//             container.style.top = event.clientY - dragY + "px";
-//         }
-//     }
-
-//     function dragEnd() {
-//         isDragging = false;
-//         document.removeEventListener("mousemove", drag);
-//         document.removeEventListener("mouseup", dragEnd);
-//     }
-
-// }
-
 
 function GetElementProps(stylesObject) {
     return Array.from(stylesObject).reduce((acc, propName) => {
         acc[propName] = stylesObject.getPropertyValue(propName);
         return acc;
     }, {});
-
 }
 
 
