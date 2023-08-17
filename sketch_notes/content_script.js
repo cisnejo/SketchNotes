@@ -18,7 +18,7 @@ function LoadTextBoxes(textBox_data) {
     const textBoxContainer = document.createElement('div')
     const textBoxTitle = document.createElement('input')
     const textBoxInput = document.createElement('textarea')
-
+    const textBoxResizeArea = document.createElement('div')
 
     draggableArea.dataset.draggable = 'true'
 
@@ -31,7 +31,14 @@ function LoadTextBoxes(textBox_data) {
       top: '-20px',
       backgroundColor: 'black',
     }
-
+    const styles_resizeArea = {
+      width: '20px',
+      height: '20px',
+      backgroundColor: 'black',
+      position: 'absolute',
+      bottom: '0',
+      right: '0'
+    }
 
 
     textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
@@ -43,21 +50,29 @@ function LoadTextBoxes(textBox_data) {
     textBoxContainer.appendChild(draggableArea)
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
+    textBoxContainer.appendChild(textBoxResizeArea)
 
     Object.assign(textBoxContainer.style, textBox.props.textBoxContainer_props)
     Object.assign(textBoxTitle.style, textBox.props.textBoxTitle_props)
     Object.assign(textBoxInput.style, textBox.props.textBoxInput_props)
     Object.assign(draggableArea.style, styles_draggableArea)
+    Object.assign(textBoxResizeArea.style, styles_resizeArea)
+
 
     document.body.appendChild(textBoxContainer)
     let newBox = false
     //textBoxContainer.addEventListener('mousedown', (e) => {dragStart(e, textBoxContainer)})
+
+    textBoxInput.style.flex = '1'
+    textBoxInput.style.width = '90%'
+    textBoxTitle.style.width = '90%'
 
     const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
     textBoxContainer.style.display = 'none'
     textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
     textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
+    textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoxOpions, textBoxIndex))
   })
 
 }
@@ -100,6 +115,7 @@ function spawnThings() {
 
   window.addEventListener('scroll', increaseCanvasSize)
   window.addEventListener('resize', resizeCanvas)
+
   function resizeCanvas() {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight

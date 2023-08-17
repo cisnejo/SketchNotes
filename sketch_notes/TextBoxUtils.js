@@ -7,19 +7,13 @@ function CreateTextBox() {
     const draggableArea = document.createElement('div')
     const textBoxTitle = document.createElement('input')
     const textBoxInput = document.createElement('textarea')
+    const textBoxResizeArea = document.createElement('div')
 
     draggableArea.dataset.draggable = 'true'
 
     textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
     textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
 
-    const styles_draggableArea = {
-        height: '20px',
-        width: '100%',
-        left: '0',
-        top: '-20px',
-        backgroundColor: 'black',
-    }
     const styles_textBoxContainer = {
         height: '200px',
         width: '200px',
@@ -33,6 +27,13 @@ function CreateTextBox() {
         backgroundColor: 'RGB(245, 245, 66)',
         zIndex: `${textboxZindex}`,
         paddingBottom: '5px'
+    }
+    const styles_draggableArea = {
+        height: '20px',
+        width: '100%',
+        left: '0',
+        top: '-20px',
+        backgroundColor: 'black',
     }
     const styles_textBoxTitle = {
         border: 'none',
@@ -50,7 +51,15 @@ function CreateTextBox() {
         width: '90%',
         paddingBottom: '5px',
         backgroundColor: 'rgba(0,0,0,0)',
-
+        resize: 'none',
+    }
+    const styles_resizeArea = {
+        width: '20px',
+        height: '20px',
+        backgroundColor: 'black',
+        position: 'absolute',
+        bottom: '0',
+        right: '0'
     }
 
     textBoxContainer.className = 'sketch_textbox'
@@ -59,19 +68,21 @@ function CreateTextBox() {
     Object.assign(textBoxTitle.style, styles_textBoxTitle)
     Object.assign(textBoxInput.style, styles_textBoxInput)
     Object.assign(draggableArea.style, styles_draggableArea)
-
+    Object.assign(textBoxResizeArea.style, styles_resizeArea)
     let newBox = true
 
     textBoxTitle.value = 'Title'
     textBoxContainer.appendChild(draggableArea)
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
+    textBoxContainer.appendChild(textBoxResizeArea)
 
     const textBoXProps = { textBoxContainer, textBoxTitle, textBoxInput }
+
     textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
     textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
-
+    textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoXProps, textBoxIndex))
     return textBoxContainer
 }
 
@@ -97,6 +108,32 @@ function AppendTextBoxData(textDataObject, textBoxIndex) {
 
     localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
 }
+
+function resizeArea(e, newBox, textBoXProps, textBoxIndex) {
+    const { target } = e
+
+    const parent = target.parentElement
+    const { offsetWidth, offsetHeight } = parent
+    let { clientX, clientY } = e
+    console.log(parent)
+    window.addEventListener('mousemove', drag)
+    window.addEventListener('mouseup', removeListeners)
+
+    SaveTextBoxData(newBox, textBoXProps, textBoxIndex)
+
+    function drag(e) {
+        let { clientX: currentX, clientY: currentY } = e
+        const delta = { x: currentX - clientX, y: currentY - clientY }
+        parent.style.width = `${offsetWidth + delta.x}px`
+        parent.style.height = `${offsetHeight + delta.y}px`
+    }
+
+    function removeListeners() {
+        window.removeEventListener('mousemove', drag)
+        window.removeEventListener('mouseup', removeListeners)
+    }
+}
+
 
 function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
 
@@ -148,5 +185,5 @@ function SaveTextBoxData(newBox, textBoxContainer, textBoxIndex) {
 }
 
 function GetTextBoxData(textBox) {
-    console.log(textBox)
+
 }
