@@ -105,7 +105,7 @@ function handleCanvasToggle(canvas, btn_toggle) {
             textbox.style.display = 'none'
         }
         else {
-            textbox.style.display = 'block'
+            textbox.style.display = 'flex'
         }
     })
     return !canvasOn
