@@ -92,7 +92,16 @@ function LoadTextBoxes(textBox_data) {
     textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoxOpions, textBoxIndex))
     deleteBox.addEventListener('click', (e) => {
       const { parentElement } = e.target
+      let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+      const newTextBoxData = sketchData.textBoxData.filter(textBoxInfo => {
+        return textBoxIndex !== textBoxInfo.id
+      })
+      localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
+
+
       parentElement.remove()
+      // clear the canvas
+
     })
   })
 

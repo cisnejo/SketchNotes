@@ -8,11 +8,21 @@ function CreateTextBox() {
     const textBoxTitle = document.createElement('input')
     const textBoxInput = document.createElement('textarea')
     const textBoxResizeArea = document.createElement('div')
+    const deleteBox = document.createElement("div")
 
     draggableArea.dataset.draggable = 'true'
 
     textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
     textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
+
+    const styles_deleteBox = {
+        width: '20px',
+        height: '20px',
+        backgroundColor: 'red',
+        position: 'absolute',
+        top: '0',
+        right: '0'
+    }
 
     const styles_textBoxContainer = {
         height: '200px',
@@ -28,6 +38,7 @@ function CreateTextBox() {
         zIndex: `${textboxZindex}`,
         paddingBottom: '5px'
     }
+
     const styles_draggableArea = {
         height: '20px',
         width: '100%',
@@ -35,6 +46,7 @@ function CreateTextBox() {
         top: '-20px',
         backgroundColor: 'black',
     }
+
     const styles_textBoxTitle = {
         border: 'none',
         height: '50px',
@@ -43,8 +55,8 @@ function CreateTextBox() {
         border: 'none',
         paddingBottom: '5px',
         backgroundColor: 'rgba(0,0,0,0)',
-
     }
+
     const styles_textBoxInput = {
         flex: '1',
         border: 'none',
@@ -53,6 +65,7 @@ function CreateTextBox() {
         backgroundColor: 'rgba(0,0,0,0)',
         resize: 'none',
     }
+
     const styles_resizeArea = {
         width: '20px',
         height: '20px',
@@ -76,6 +89,7 @@ function CreateTextBox() {
     textBoxContainer.appendChild(textBoxTitle)
     textBoxContainer.appendChild(textBoxInput)
     textBoxContainer.appendChild(textBoxResizeArea)
+    textBoxContainer.appendChild(deleteBox)
 
     const textBoXProps = { textBoxContainer, textBoxTitle, textBoxInput }
 
@@ -83,6 +97,19 @@ function CreateTextBox() {
     textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoXProps, textBoxIndex))
     textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
     textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoXProps, textBoxIndex))
+    deleteBox.addEventListener('click', (e) => {
+        const { parentElement } = e.target
+        let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+        const newTextBoxData = sketchData.textBoxData.filter(textBoxInfo => {
+            return textBoxIndex !== textBoxInfo.id
+        })
+        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
+
+
+        parentElement.remove()
+        // clear the canvas
+
+    })
     return textBoxContainer
 }
 
