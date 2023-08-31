@@ -82,6 +82,7 @@ function CreateTextBox() {
     Object.assign(textBoxInput.style, styles_textBoxInput)
     Object.assign(draggableArea.style, styles_draggableArea)
     Object.assign(textBoxResizeArea.style, styles_resizeArea)
+    Object.assign(deleteBox.style, styles_deleteBox)
     let newBox = true
 
     textBoxTitle.value = 'Title'
