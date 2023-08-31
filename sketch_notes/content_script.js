@@ -13,107 +13,13 @@ window.onload = function () {
   color_picker.value = "#00000"
 }
 
-function LoadTextBoxes(textBox_data) {
-  textBox_data.forEach(textBox => {
-    const textBoxIndex = textBox.id
-    const draggableArea = document.createElement('div')
-    const textBoxContainer = document.createElement('div')
-    const textBoxTitle = document.createElement('input')
-    const textBoxInput = document.createElement('textarea')
-    const textBoxResizeArea = document.createElement('div')
-    const deleteBox = document.createElement("div")
 
-    draggableArea.dataset.draggable = 'true'
-
-    textBoxContainer.className = 'sketch_textbox'
-
-    const styles_deleteBox = {
-      width: '20px',
-      height: '20px',
-      backgroundColor: 'red',
-      position: 'absolute',
-      top: '0',
-      right: '0'
-    }
-
-    const styles_draggableArea = {
-      height: '20px',
-      width: '100%',
-      left: '0',
-      top: '-20px',
-      backgroundColor: 'black',
-    }
-    const styles_resizeArea = {
-      width: '20px',
-      height: '20px',
-      backgroundColor: 'black',
-      position: 'absolute',
-      bottom: '0',
-      right: '0'
-    }
-
-
-    textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
-    textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
-
-    textBoxTitle.value = textBox.text.input
-    textBoxInput.value = textBox.text.textarea
-
-    textBoxContainer.appendChild(draggableArea)
-    textBoxContainer.appendChild(textBoxTitle)
-    textBoxContainer.appendChild(textBoxInput)
-    textBoxContainer.appendChild(textBoxResizeArea)
-    textBoxContainer.appendChild(deleteBox)
-
-    Object.assign(textBoxContainer.style, textBox.props.textBoxContainer_props)
-    Object.assign(textBoxTitle.style, textBox.props.textBoxTitle_props)
-    Object.assign(textBoxInput.style, textBox.props.textBoxInput_props)
-    Object.assign(draggableArea.style, styles_draggableArea)
-    Object.assign(textBoxResizeArea.style, styles_resizeArea)
-    Object.assign(deleteBox.style, styles_deleteBox)
-
-    //Default styling 
-    textBoxContainer.style.display = 'none'
-    textBoxContainer.style.alignContent = 'center'
-    textBoxTitle.style.width = '90%'
-    textBoxInput.style.width = '90%'
-
-    document.body.appendChild(textBoxContainer)
-    let newBox = false
-    //textBoxContainer.addEventListener('mousedown', (e) => {dragStart(e, textBoxContainer)})
-
-
-
-    const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
-
-    textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
-    textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
-    textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
-    textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoxOpions, textBoxIndex))
-    deleteBox.addEventListener('click', (e) => {
-      const { parentElement } = e.target
-      let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-      const newTextBoxData = sketchData.textBoxData.filter(textBoxInfo => {
-        return textBoxIndex !== textBoxInfo.id
-      })
-      localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
-
-
-      parentElement.remove()
-      // clear the canvas
-
-    })
-  })
-
-}
 
 function spawnThings() {
 
   let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
   let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
 
-  let textBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : []
-  LoadTextBoxes(textBoxData)
 
   const controlContainer = createControlContainer()
 
@@ -127,7 +33,6 @@ function spawnThings() {
   const clearButton = createClearBtn(canvas, context)
 
   // need to make textbox spawn at the current viewport top-left
-  create_textBox_btn.addEventListener('click', () => document.body.appendChild(CreateTextBox(canvasOn)))
 
   const btnControlContainer = controlContainer.querySelector('#sketch-ctrl-container')
   btnControlContainer.appendChild(create_textBox_btn)
@@ -224,7 +129,7 @@ function createClearBtn(canvas, context) {
   button.innerText = "clear Notes"
   button.addEventListener('click', () => {
     localStorage.setItem('sketch_data', JSON.stringify([]))
-    document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())
+    // document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())  CHANGE TO CANVAS BOX OBJECT 
     context.clearRect(0, 0, canvas.width, canvas.height)
   })
   return button
