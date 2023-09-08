@@ -6,11 +6,6 @@ const controlBoxZindex = canvasZindex + 1
 const textboxZindex = controlBoxZindex + 1
 window.onload = function () {
   spawnThings()
-  // chrome.storage.local.clear()
-  const color_picker = document.createElement('input')
-  color_picker.id = "color-picker"
-  color_picker.type = "color"
-  color_picker.value = "#00000"
 }
 
 
@@ -20,16 +15,21 @@ function spawnThings() {
   let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
   let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
 
+  let stickyData = [{ x: 300, y: 300, w: 200, h: 200, color: 'yellow' }]
 
   const controlContainer = createControlContainer()
 
   const create_textBox_btn = createButton("create-text-btn", "Spawn Textbox", controlContainer)
   //const load_btn = createButton("load-btn", "Load", controlContainer)
   const canvas = createCanvas();
+
   const toggle_canvas_btn = createCanvasToggle(canvas)
   const context = canvas.getContext('2d')
   //const sketchContainer = createSketchContainer();
-  cavnasProc(canvas, context, strokeData)
+
+  HandleStrokes(canvas, context, strokeData)
+  CreateStickyNotes(canvas, stickyData)
+
   const clearButton = createClearBtn(canvas, context)
 
   // need to make textbox spawn at the current viewport top-left
@@ -145,7 +145,7 @@ function createCanvasToggle(canvas) {
   return button
 }
 
-function cavnasProc(canvas, context, strokes) {
+function HandleStrokes(canvas, context, strokes) {
 
   var isDrawing = false;
   var lastX = 0;
@@ -158,17 +158,13 @@ function cavnasProc(canvas, context, strokes) {
   strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY,
     stroke.endX, stroke.endY, stroke.color, stroke.width))
 
-  canvas.addEventListener('mousedown', function (e) {
-    isDrawing = true;
-
-    lastX = e.pageX - canvas.offsetLeft;
-    lastY = e.pageY - canvas.offsetTop;
-
-
+  canvas.addEventListener('mousedown', (e) => {
+    PenIsDrawing(e)
   });
 
-  canvas.addEventListener('mousemove', function (e) {
 
+
+  canvas.addEventListener('mousemove', function (e) {
     if (isDrawing) {
       const { scrollX, scrollY } = window
       const { clientX, clientY } = e
@@ -184,31 +180,18 @@ function cavnasProc(canvas, context, strokes) {
         width: width,
         color: strokeColor
       });
-
       lastX = currentX;
       lastY = currentY;
     }
   });
 
   canvas.addEventListener('mouseup', function () {
-    isDrawing = false;
-    saveStrokes();
+    PenIsUp()
   });
 
   canvas.addEventListener('mouseleave', function () {
-    isDrawing = false;
+    PenIsUp()
   });
-
-
-
-  function saveStrokes() {
-
-    let sketchData = JSON.parse(localStorage.getItem('sketch_data'))
-    let currentSketchStrokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    let concatStrokes = currentSketchStrokes.concat(local_strokes)
-    localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: concatStrokes }))
-    local_strokes = []
-  }
 
   return strokes
 }
@@ -224,4 +207,26 @@ function drawLine(context, startX, startY, endX, endY, color, width) {
     context.stroke();
   }
 
+}
+
+/* mousedown */
+function PenIsDrawing(e) {
+  isDrawing = true;
+  lastX = e.pageX - canvas.offsetLeft;
+  lastY = e.pageY - canvas.offsetTop;
+}
+
+/* mouseup */
+function PenIsUp() {
+  isDrawing = false;
+  saveStrokes();
+}
+
+function saveStrokes() {
+
+  let sketchData = JSON.parse(localStorage.getItem('sketch_data'))
+  let currentSketchStrokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+  let concatStrokes = currentSketchStrokes.concat(local_strokes)
+  localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: concatStrokes }))
+  local_strokes = []
 }
