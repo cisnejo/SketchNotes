@@ -53,5 +53,8 @@ let strokes = {
     },
     getStoredStrokes: function () {
 
+    },
+    storeSaveStrokes: function () {
+        this.isDrawing = false;
     }
 }
