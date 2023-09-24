@@ -94,13 +94,10 @@ function styleLogo(logo, styles = null) {
 
 }
 
-function handleCanvasToggle(canvas, btn_toggle) {
-
-    canvasOn ? canvas.style.display = "none" : canvas.style.display = 'block'
-    canvasOn ? btn_toggle.style.backgroundColor = 'RGB(240, 240, 240)' : btn_toggle.style.backgroundColor = 'black'
-    canvasOn ? btn_toggle.style.color = "black" : btn_toggle.style.color = 'white'
-
-    return !canvasOn
+function handleCanvasToggle(CLASS_CANVAS, btn_toggle) {
+    CLASS_CANVAS.ToggleCanvas()
+    CLASS_CANVAS.display === 'none' ? btn_toggle.style.backgroundColor = 'RGB(240, 240, 240)' : btn_toggle.style.backgroundColor = 'black'
+    CLASS_CANVAS.display === 'none' ? btn_toggle.style.color = "black" : btn_toggle.style.color = 'white'
 }
 
 window.addEventListener('mousedown', (e) => {

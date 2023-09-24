@@ -18,10 +18,9 @@
       "js": [
         "content_script.js",
         "new_script.js",
-        "StickyNote.js",
-        "Canvas.js",
-        "Draw.js",
-        "StickyNote.js"
+        ".StickyNote.js",
+        ".Canvas.js",
+        ".Draw.js"
       ]
     }
   ]

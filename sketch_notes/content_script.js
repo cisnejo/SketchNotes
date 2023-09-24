@@ -4,6 +4,8 @@ let canvasOn = false
 const canvasZindex = 100000
 const controlBoxZindex = canvasZindex + 1
 const textboxZindex = controlBoxZindex + 1
+const CONTROL_STATE = DRAWING_STATE
+
 window.onload = function () {
   spawnThings()
 }
@@ -12,25 +14,27 @@ window.onload = function () {
 
 function spawnThings() {
 
-  let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-  let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
 
-  let stickyData = [{ x: 300, y: 300, w: 200, h: 200, color: 'yellow' }]
+
+  //let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+  // let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+
+  //let stickyData = [{ x: 300, y: 300, w: 200, h: 200, color: 'yellow' }]
 
   const controlContainer = createControlContainer()
 
   const create_textBox_btn = createButton("create-text-btn", "Spawn Textbox", controlContainer)
   //const load_btn = createButton("load-btn", "Load", controlContainer)
-  const canvas = createCanvas();
+  //const canvas = createCanvas();
 
-  const toggle_canvas_btn = createCanvasToggle(canvas)
-  const context = canvas.getContext('2d')
+  const toggle_canvas_btn = createCanvasToggle(SKETCH_CANVAS)
+  //const context = canvas.getContext('2d')
   //const sketchContainer = createSketchContainer();
 
-  HandleStrokes(canvas, context, strokeData)
-  CreateStickyNotes(canvas, stickyData)
+  //HandleStrokes(canvas, context, strokeData)
+  // CreateStickyNotes(canvas, stickyData)
 
-  const clearButton = createClearBtn(canvas, context)
+  const clearButton = createClearBtn(SKETCH_CANVAS, SKETCH_CANVAS.context)
 
   // need to make textbox spawn at the current viewport top-left
 
@@ -43,33 +47,32 @@ function spawnThings() {
   styleControlButtons(controlContainer, textStyes);
 
   controlContainer.style.zIndex = `${controlBoxZindex}`
-  canvas.style.zIndex = `${canvasZindex}`
+  //canvas.style.zIndex = `${canvasZindex}`
 
-  document.body.appendChild(canvas)
+  //document.body.appendChild(canvas)
   document.body.appendChild(controlContainer)
 
-  window.addEventListener('scroll', increaseCanvasSize)
-  window.addEventListener('resize', resizeCanvas)
+  window.addEventListener('scroll', () => increaseCanvasSize(SKETCH_CANVAS))
+  window.addEventListener('resize', () => resizeCanvas(SKETCH_CANVAS))
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    context.clearRect(0, 0, canvas.width, canvas.height);
+  function resizeCanvas(CANVAS_CLASS) {
+    CANVAS_CLASS.ResizeCanvas(window.innerWidth, window.innerHeight)
+    const { canvas, context } = CANVAS_CLASS
+    CANVAS_CLASS.ClearCanvas()
+
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-
     strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
-
   }
-  function increaseCanvasSize() {
+  function increaseCanvasSize(CANVAS_CLASS) {
+    const { scrollY } = window
     // Set the new canvas dimensions
-    canvas.style.top = `${window.scrollY}px`
-    const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    CANVAS_CLASS.ScrollCanvas(scrollY)
+    CANVAS_CLASS.ClearCanvas()
+
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-
     strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
 
@@ -135,98 +138,13 @@ function createClearBtn(canvas, context) {
   return button
 }
 
-function createCanvasToggle(canvas) {
+function createCanvasToggle(CLASS_CANVAS) {
   const button = document.createElement('button')
   button.id = 'toggle-canvas-btn'
   button.innerText = 'Toggle Sketch'
   button.addEventListener('click', () => {
-    canvasOn = handleCanvasToggle(canvas, button)
+    canvasOn = handleCanvasToggle(CLASS_CANVAS, button)
   })
   return button
 }
 
-function HandleStrokes(canvas, context, strokes) {
-
-  var isDrawing = false;
-  var lastX = 0;
-  var lastY = 0;
-  var local_strokes = []
-  var strokeColor = '#000000';
-  let width = 3;
-
-  //Load saved strokes
-  strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY,
-    stroke.endX, stroke.endY, stroke.color, stroke.width))
-
-  canvas.addEventListener('mousedown', (e) => {
-    PenIsDrawing(e)
-  });
-
-
-
-  canvas.addEventListener('mousemove', function (e) {
-    if (isDrawing) {
-      const { scrollX, scrollY } = window
-      const { clientX, clientY } = e
-      var currentX = clientX - canvas.offsetLeft + scrollX;
-      var currentY = clientY - canvas.offsetTop + scrollY;
-
-      drawLine(context, lastX, lastY, currentX, currentY, strokeColor, width);
-      local_strokes.push({
-        startX: lastX,
-        startY: lastY + window.scrollY,
-        endX: currentX,
-        endY: currentY + window.scrollY,
-        width: width,
-        color: strokeColor
-      });
-      lastX = currentX;
-      lastY = currentY;
-    }
-  });
-
-  canvas.addEventListener('mouseup', function () {
-    PenIsUp()
-  });
-
-  canvas.addEventListener('mouseleave', function () {
-    PenIsUp()
-  });
-
-  return strokes
-}
-
-function drawLine(context, startX, startY, endX, endY, color, width) {
-  // only draw if in view of the user
-  if (startY > 0 && endY > 0 && startY < window.innerHeight && endY < window.innerHeight) {
-    context.beginPath();
-    context.moveTo(startX, startY);
-    context.lineTo(endX, endY);
-    context.strokeStyle = "black";
-    context.lineWidth = width
-    context.stroke();
-  }
-
-}
-
-/* mousedown */
-function PenIsDrawing(e) {
-  isDrawing = true;
-  lastX = e.pageX - canvas.offsetLeft;
-  lastY = e.pageY - canvas.offsetTop;
-}
-
-/* mouseup */
-function PenIsUp() {
-  isDrawing = false;
-  saveStrokes();
-}
-
-function saveStrokes() {
-
-  let sketchData = JSON.parse(localStorage.getItem('sketch_data'))
-  let currentSketchStrokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-  let concatStrokes = currentSketchStrokes.concat(local_strokes)
-  localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: concatStrokes }))
-  local_strokes = []
-}
