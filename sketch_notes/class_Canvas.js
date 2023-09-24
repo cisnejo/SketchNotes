@@ -43,18 +43,19 @@ SKETCH_CANVAS.ResizeCanvas(window.innerWidth, window.innerHeight)
 
 SKETCH_CANVAS.StyleCanvas()
 
-SKETCH_CANVAS.canvas.addEventListeners('mousedown', () => {
+
+SKETCH_CANVAS.canvas.addEventListener('mousedown', () => {
     CONTROL_STATE.mousedown()
 })
-SKETCH_CANVAS.canvas.addEventListeners('mousemove', () => {
+SKETCH_CANVAS.canvas.addEventListener('mousemove', () => {
     CONTROL_STATE.mousemove()
 })
 
-SKETCH_CANVAS.canvas.addEventListeners('mouseup', () => {
+SKETCH_CANVAS.canvas.addEventListener('mouseup', () => {
     CONTROL_STATE.mouseup()
 })
 
-SKETCH_CANVAS.canvas.addEventListeners('mouseleave', () => {
+SKETCH_CANVAS.canvas.addEventListener('mouseleave', () => {
     CONTROL_STATE.mouseleave()
 })
 

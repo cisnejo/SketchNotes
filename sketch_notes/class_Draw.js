@@ -55,13 +55,17 @@ const DRAWING_STATE = {
         strokes.isDrawing = true;
     },
 
-    mousemove: strokes.drawLine(SKETCH_CANVAS),
+    mousemove: function () {
+        strokes.drawLine(SKETCH_CANVAS)
+    },
 
     mouseup: function () {
+        console.log('mosueup')
         strokes.isDrawing = false;
         strokes.strsaveStrokes();
     },
     mouseleave: function () {
+
         strokes.isDrawing = false;
         strokes.saveStrokes();
     }

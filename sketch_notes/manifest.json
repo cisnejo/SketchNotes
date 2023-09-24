@@ -4,23 +4,17 @@
   "description": "used for taking notes on page like a whiteboard",
   "manifest_version": 3,
   "author": "Joseph Cisneros",
-  "permissions": [
-    "activeTab",
-    "tabs",
-    "<all_urls>",
-    "storage"
-  ],
+  "permissions": ["activeTab", "tabs", "<all_urls>", "storage"],
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "js": [
+        "class_StickyNote.js",
+        "class_Canvas.js",
+        "class_Draw.js",
         "content_script.js",
-        "new_script.js",
-        ".StickyNote.js",
-        ".Canvas.js",
-        ".Draw.js"
+        "new_script.js"
+  
       ]
     }
   ]
