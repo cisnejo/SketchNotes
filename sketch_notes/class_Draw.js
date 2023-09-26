@@ -5,15 +5,18 @@ let strokes = {
     isDrawing: false,
     lastX: 0,
     lastY: 0,
+    currentX: 0,
+    currentY: 0,
     strokeColor: '#000000',
     lineWidth: 3,
-    drawStrokes: function (context, startX, startY, endX, endY, color, width) {
-        if (startY >= 0 && endY >= 0 && startY <= window.innerHeight && endY <= window.innerHeight) {
+    drawStrokes: function (strokeColor, strokeWidth) {
+        const { context } = SKETCH_CANVAS
+        if (this.lastY >= 0 && this.currentY >= 0 && this.lastY <= window.innerHeight && this.currentY <= window.innerHeight) {
             context.beginPath();
-            context.moveTo(startX, startY);
-            context.lineTo(endX, endY);
+            context.moveTo(this.lastX, this.lastY);
+            context.lineTo(this.currentX, this.currentY);
             context.strokeStyle = "black";
-            context.lineWidth = width
+            context.lineWidth = strokeWidth
             context.stroke();
         }
     },
@@ -25,29 +28,29 @@ let strokes = {
         localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: this.localSketchData }))
         this.localStrokes = []
     },
-    drawLine: function (e, CANVAS_CLASS) {
+    drawLine: function (e) {
         if (this.isDrawing) {
+            const { canvas } = SKETCH_CANVAS
             const { scrollX, scrollY } = window
             const { clientX, clientY } = e
-            const { context, canvas } = CANVAS_CLASS
             let strokeColor = "#000000"
-            let width = 3
-            var currentX = clientX - canvas.offsetLeft + scrollX;
-            var currentY = clientY - canvas.offsetTop + scrollY;
+            let strokeWidth = 3
+            this.currentX = clientX - canvas.offsetLeft + scrollX;
+            this.currentY = clientY - canvas.offsetTop + scrollY;
 
 
 
-            this.drawStrokes(context, this.lastX, this.lastY, currentX, currentY, strokeColor, width);
+            this.drawStrokes(strokeColor, strokeWidth);
             this.localStrokes.push({
                 startX: this.lastX,
                 startY: this.lastY + window.scrollY,
-                endX: currentX,
-                endY: currentY + window.scrollY,
-                width: width,
+                endX: this.currentX,
+                endY: this.currentY + window.scrollY,
+                width: strokeWidth,
                 color: strokeColor
             });
-            this.lastX = currentX;
-            this.lastY = currentY;
+            this.lastX = this.currentX;
+            this.lastY = this.currentY;
         }
     }
 }
@@ -61,7 +64,7 @@ const DRAWING_STATE = {
     },
 
     mousemove: function (e) {
-        strokes.drawLine(e, SKETCH_CANVAS)
+        strokes.drawLine(e)
     },
 
     mouseup: function () {
