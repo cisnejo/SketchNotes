@@ -21,13 +21,14 @@ let strokes = {
         }
     },
     getStoredStrokes: function () {
-
+        return JSON.parse(localStorage.getItem('sketch_data'))
     },
     saveStrokes: function () {
         this.localSketchData = { ...this.localSketchData, strokes: [this.localSketchData.strokes, this.localStrokes] }
         localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: this.localSketchData }))
         this.localStrokes = []
     },
+
     drawLine: function (e) {
         if (this.isDrawing) {
             const { canvas } = SKETCH_CANVAS
@@ -80,7 +81,6 @@ const DRAWING_STATE = {
 }
 
 /* 
-
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
     strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,

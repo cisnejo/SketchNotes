@@ -14,8 +14,6 @@ window.onload = function () {
 
 function spawnThings() {
 
-
-
   //let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
   // let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
 
@@ -25,7 +23,7 @@ function spawnThings() {
 
   const create_textBox_btn = createButton("create-text-btn", "Spawn Textbox", controlContainer)
   //const load_btn = createButton("load-btn", "Load", controlContainer)
-  //const canvas = createCanvas();
+
 
   const toggle_canvas_btn = createCanvasToggle(SKETCH_CANVAS)
   //const context = canvas.getContext('2d')
@@ -61,9 +59,9 @@ function spawnThings() {
     CANVAS_CLASS.ClearCanvas()
 
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
-      stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
+    // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+    // strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+    //   stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
   }
   function increaseCanvasSize(CANVAS_CLASS) {
     const { scrollY } = window
@@ -71,9 +69,10 @@ function spawnThings() {
     CANVAS_CLASS.ScrollCanvas(scrollY)
     CANVAS_CLASS.ClearCanvas()
 
-    const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+    // const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    sketchData = strokes.getStoredStrokes()
+    // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+    strokes.forEach(stroke => stroke.drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
 
     // for control container
@@ -113,11 +112,6 @@ function createControlContainer() {
 }
 
 
-function createCanvas() {
-  const canvas = document.createElement('canvas')
-  styleCanvas(canvas)
-  return canvas
-}
 
 function createButton(id, innerText) {
   const button = document.createElement('button')
@@ -133,7 +127,7 @@ function createClearBtn(canvas, context) {
   button.addEventListener('click', () => {
     localStorage.setItem('sketch_data', JSON.stringify([]))
     // document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())  CHANGE TO CANVAS BOX OBJECT 
-    context.clearRect(0, 0, canvas.width, canvas.height)
+    canvas.ClearCanvas()
   })
   return button
 }
