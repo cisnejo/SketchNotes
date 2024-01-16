@@ -4,130 +4,37 @@ let canvasOn = false
 const canvasZindex = 100000
 const controlBoxZindex = canvasZindex + 1
 const textboxZindex = controlBoxZindex + 1
+const CONTROL_STATE = DRAWING_STATE
+
 window.onload = function () {
   spawnThings()
-  // chrome.storage.local.clear()
-  const color_picker = document.createElement('input')
-  color_picker.id = "color-picker"
-  color_picker.type = "color"
-  color_picker.value = "#00000"
 }
 
-function LoadTextBoxes(textBox_data) {
-  textBox_data.forEach(textBox => {
-    const textBoxIndex = textBox.id
-    const draggableArea = document.createElement('div')
-    const textBoxContainer = document.createElement('div')
-    const textBoxTitle = document.createElement('input')
-    const textBoxInput = document.createElement('textarea')
-    const textBoxResizeArea = document.createElement('div')
-    const deleteBox = document.createElement("div")
 
-    draggableArea.dataset.draggable = 'true'
-
-    textBoxContainer.className = 'sketch_textbox'
-
-    const styles_deleteBox = {
-      width: '20px',
-      height: '20px',
-      backgroundColor: 'red',
-      position: 'absolute',
-      top: '0',
-      right: '0'
-    }
-
-    const styles_draggableArea = {
-      height: '20px',
-      width: '100%',
-      left: '0',
-      top: '-20px',
-      backgroundColor: 'black',
-    }
-    const styles_resizeArea = {
-      width: '20px',
-      height: '20px',
-      backgroundColor: 'black',
-      position: 'absolute',
-      bottom: '0',
-      right: '0'
-    }
-
-
-    textBoxTitle.addEventListener('focus', () => { textBoxTitle.style.outline = 'none' })
-    textBoxInput.addEventListener('focus', () => { textBoxInput.style.outline = 'none' })
-
-    textBoxTitle.value = textBox.text.input
-    textBoxInput.value = textBox.text.textarea
-
-    textBoxContainer.appendChild(draggableArea)
-    textBoxContainer.appendChild(textBoxTitle)
-    textBoxContainer.appendChild(textBoxInput)
-    textBoxContainer.appendChild(textBoxResizeArea)
-    textBoxContainer.appendChild(deleteBox)
-
-    Object.assign(textBoxContainer.style, textBox.props.textBoxContainer_props)
-    Object.assign(textBoxTitle.style, textBox.props.textBoxTitle_props)
-    Object.assign(textBoxInput.style, textBox.props.textBoxInput_props)
-    Object.assign(draggableArea.style, styles_draggableArea)
-    Object.assign(textBoxResizeArea.style, styles_resizeArea)
-    Object.assign(deleteBox.style, styles_deleteBox)
-
-    //Default styling 
-    textBoxContainer.style.display = 'none'
-    textBoxContainer.style.alignContent = 'center'
-    textBoxTitle.style.width = '90%'
-    textBoxInput.style.width = '90%'
-
-    document.body.appendChild(textBoxContainer)
-    let newBox = false
-    //textBoxContainer.addEventListener('mousedown', (e) => {dragStart(e, textBoxContainer)})
-
-
-
-    const textBoxOpions = { textBoxContainer, textBoxTitle, textBoxInput }
-
-    textBoxContainer.addEventListener('mouseout', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
-    textBoxContainer.addEventListener('mouseup', () => newBox = SaveTextBoxData(newBox, textBoxOpions, textBoxIndex))
-    textBoxContainer.addEventListener('keyup', (e) => UpdateTextBoxData(e.target, textBoxIndex))
-    textBoxResizeArea.addEventListener('mousedown', (e) => resizeArea(e, newBox, textBoxOpions, textBoxIndex))
-    deleteBox.addEventListener('click', (e) => {
-      const { parentElement } = e.target
-      let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-      const newTextBoxData = sketchData.textBoxData.filter(textBoxInfo => {
-        return textBoxIndex !== textBoxInfo.id
-      })
-      localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, textBoxData: newTextBoxData }))
-
-
-      parentElement.remove()
-      // clear the canvas
-
-    })
-  })
-
-}
 
 function spawnThings() {
 
-  let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-  let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+  //let sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+  // let strokeData = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
 
-  let textBoxData = sketchData ? sketchData.textBoxData ? sketchData.textBoxData : [] : []
-  LoadTextBoxes(textBoxData)
+  //let stickyData = [{ x: 300, y: 300, w: 200, h: 200, color: 'yellow' }]
 
   const controlContainer = createControlContainer()
 
   const create_textBox_btn = createButton("create-text-btn", "Spawn Textbox", controlContainer)
   //const load_btn = createButton("load-btn", "Load", controlContainer)
-  const canvas = createCanvas();
-  const toggle_canvas_btn = createCanvasToggle(canvas)
-  const context = canvas.getContext('2d')
+
+
+  const toggle_canvas_btn = createCanvasToggle(SKETCH_CANVAS)
+  //const context = canvas.getContext('2d')
   //const sketchContainer = createSketchContainer();
-  cavnasProc(canvas, context, strokeData)
-  const clearButton = createClearBtn(canvas, context)
+
+  //HandleStrokes(canvas, context, strokeData)
+  // CreateStickyNotes(canvas, stickyData)
+
+  const clearButton = createClearBtn(SKETCH_CANVAS, SKETCH_CANVAS.context)
 
   // need to make textbox spawn at the current viewport top-left
-  create_textBox_btn.addEventListener('click', () => document.body.appendChild(CreateTextBox(canvasOn)))
 
   const btnControlContainer = controlContainer.querySelector('#sketch-ctrl-container')
   btnControlContainer.appendChild(create_textBox_btn)
@@ -138,34 +45,34 @@ function spawnThings() {
   styleControlButtons(controlContainer, textStyes);
 
   controlContainer.style.zIndex = `${controlBoxZindex}`
-  canvas.style.zIndex = `${canvasZindex}`
+  //canvas.style.zIndex = `${canvasZindex}`
 
-  document.body.appendChild(canvas)
+  //document.body.appendChild(canvas)
   document.body.appendChild(controlContainer)
 
-  window.addEventListener('scroll', increaseCanvasSize)
-  window.addEventListener('resize', resizeCanvas)
+  window.addEventListener('scroll', () => increaseCanvasSize(SKETCH_CANVAS))
+  window.addEventListener('resize', () => resizeCanvas(SKETCH_CANVAS))
 
-  function resizeCanvas() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-    context.clearRect(0, 0, canvas.width, canvas.height);
+  function resizeCanvas(CANVAS_CLASS) {
+    CANVAS_CLASS.ResizeCanvas(window.innerWidth, window.innerHeight)
+    const { canvas, context } = CANVAS_CLASS
+    CANVAS_CLASS.ClearCanvas()
+
     const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-
-    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
-      stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
-
+    // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+    // strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+    //   stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
   }
-  function increaseCanvasSize() {
+  function increaseCanvasSize(CANVAS_CLASS) {
+    const { scrollY } = window
     // Set the new canvas dimensions
-    canvas.style.top = `${window.scrollY}px`
-    const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+    CANVAS_CLASS.ScrollCanvas(scrollY)
+    CANVAS_CLASS.ClearCanvas()
 
-    strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+    // const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    sketchData = strokes.getStoredStrokes()
+    // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
+    strokes.forEach(stroke => stroke.drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
 
     // for control container
@@ -205,11 +112,6 @@ function createControlContainer() {
 }
 
 
-function createCanvas() {
-  const canvas = document.createElement('canvas')
-  styleCanvas(canvas)
-  return canvas
-}
 
 function createButton(id, innerText) {
   const button = document.createElement('button')
@@ -224,99 +126,19 @@ function createClearBtn(canvas, context) {
   button.innerText = "clear Notes"
   button.addEventListener('click', () => {
     localStorage.setItem('sketch_data', JSON.stringify([]))
-    document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())
-    context.clearRect(0, 0, canvas.width, canvas.height)
+    // document.querySelectorAll(".sketch_textbox").forEach(box => box.remove())  CHANGE TO CANVAS BOX OBJECT 
+    canvas.ClearCanvas()
   })
   return button
 }
 
-function createCanvasToggle(canvas) {
+function createCanvasToggle(CLASS_CANVAS) {
   const button = document.createElement('button')
   button.id = 'toggle-canvas-btn'
   button.innerText = 'Toggle Sketch'
   button.addEventListener('click', () => {
-    canvasOn = handleCanvasToggle(canvas, button)
+    canvasOn = handleCanvasToggle(CLASS_CANVAS, button)
   })
   return button
 }
 
-function cavnasProc(canvas, context, strokes) {
-
-  var isDrawing = false;
-  var lastX = 0;
-  var lastY = 0;
-  var local_strokes = []
-  var strokeColor = '#000000';
-  let width = 3;
-
-  //Load saved strokes
-  strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY,
-    stroke.endX, stroke.endY, stroke.color, stroke.width))
-
-  canvas.addEventListener('mousedown', function (e) {
-    isDrawing = true;
-
-    lastX = e.pageX - canvas.offsetLeft;
-    lastY = e.pageY - canvas.offsetTop;
-
-
-  });
-
-  canvas.addEventListener('mousemove', function (e) {
-
-    if (isDrawing) {
-      const { scrollX, scrollY } = window
-      const { clientX, clientY } = e
-      var currentX = clientX - canvas.offsetLeft + scrollX;
-      var currentY = clientY - canvas.offsetTop + scrollY;
-
-      drawLine(context, lastX, lastY, currentX, currentY, strokeColor, width);
-      local_strokes.push({
-        startX: lastX,
-        startY: lastY + window.scrollY,
-        endX: currentX,
-        endY: currentY + window.scrollY,
-        width: width,
-        color: strokeColor
-      });
-
-      lastX = currentX;
-      lastY = currentY;
-    }
-  });
-
-  canvas.addEventListener('mouseup', function () {
-    isDrawing = false;
-    saveStrokes();
-  });
-
-  canvas.addEventListener('mouseleave', function () {
-    isDrawing = false;
-  });
-
-
-
-  function saveStrokes() {
-
-    let sketchData = JSON.parse(localStorage.getItem('sketch_data'))
-    let currentSketchStrokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    let concatStrokes = currentSketchStrokes.concat(local_strokes)
-    localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: concatStrokes }))
-    local_strokes = []
-  }
-
-  return strokes
-}
-
-function drawLine(context, startX, startY, endX, endY, color, width) {
-  // only draw if in view of the user
-  if (startY > 0 && endY > 0 && startY < window.innerHeight && endY < window.innerHeight) {
-    context.beginPath();
-    context.moveTo(startX, startY);
-    context.lineTo(endX, endY);
-    context.strokeStyle = "black";
-    context.lineWidth = width
-    context.stroke();
-  }
-
-}
