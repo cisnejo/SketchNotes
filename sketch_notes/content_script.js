@@ -72,7 +72,7 @@ function spawnThings() {
     // const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     sketchData = strokes.getStoredStrokes()
     // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    strokes.forEach(stroke => stroke.drawLine(context, stroke.startX, stroke.startY - window.scrollY,
+    sketchData.forEach(stroke => stroke.drawLine(context, stroke.startX, stroke.startY - window.scrollY,
       stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
 
     // for control container
