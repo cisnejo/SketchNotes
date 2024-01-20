@@ -1,29 +1,4 @@
 
-function styleCanvas(canvas) {
-    canvas.style.display = 'none'
-    // need to change this to be the body
-    const largestElement = Array.from(document.getElementsByTagName('*')).reduce((acc, curr) => {
-        if (curr.offsetWidth > acc.width) acc.width = curr.offsetWidth
-        if (curr.offsetHeight > acc.height) acc.height = curr.offsetHeight
-        return acc
-    }, {
-        width: document.body.offsetWidth,
-        height: document.body.offsetHeight
-    })
-    const canvas_stlyes = {
-
-        left: "0",
-        top: "0",
-        margin: "0",
-        padding: "0",
-        position: "absolute",
-    }
-    Object.assign(canvas.style, canvas_stlyes)
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
-
-}
 
 function styleControlButtons(controlContainer, styles = null) {
     controlContainer.querySelectorAll('button').forEach(btn => {

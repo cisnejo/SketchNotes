@@ -9,13 +9,14 @@ let strokes = {
     currentY: 0,
     strokeColor: '#000000',
     lineWidth: 3,
-    drawStrokes: function (strokeColor, strokeWidth) {
+    drawStrokes: function (startX,startY,endX,endY,strokeColor, strokeWidth) {
         const { context } = SKETCH_CANVAS
-        if (this.lastY >= 0 && this.currentY >= 0 && this.lastY <= window.innerHeight && this.currentY <= window.innerHeight) {
+
+        if (startY>= 0 && endY >= 0 && startY<= window.innerHeight && endY <= window.innerHeight) {
             context.beginPath();
-            context.moveTo(this.lastX, this.lastY);
-            context.lineTo(this.currentX, this.currentY);
-            context.strokeStyle = "black";
+            context.moveTo(startX ,startY);
+            context.lineTo(endX, endY);
+            context.strokeStyle = strokeColor;
             context.lineWidth = strokeWidth
             context.stroke();
         }
@@ -24,8 +25,11 @@ let strokes = {
         return JSON.parse(localStorage.getItem('sketch_data'))
     },
     saveStrokes: function () {
-        this.localSketchData = { ...this.localSketchData, strokes: [this.localSketchData.strokes, this.localStrokes] }
-        localStorage.setItem('sketch_data', JSON.stringify({ ...sketchData, strokes: this.localSketchData }))
+
+        let allStrokes  = this.localStrokes.concat(this.getStoredStrokes().strokes)
+        this.localSketchData = { ...this.localSketchData, strokes: allStrokes }
+
+        localStorage.setItem('sketch_data', JSON.stringify({ ...this.getStoredStrokes(), strokes: this.localSketchData.strokes }))
         this.localStrokes = []
     },
 
@@ -41,7 +45,7 @@ let strokes = {
 
 
 
-            this.drawStrokes(strokeColor, strokeWidth);
+            this.drawStrokes(this.lastX,this.lastY,this.currentX,this.currentY,strokeColor, strokeWidth);
             this.localStrokes.push({
                 startX: this.lastX,
                 startY: this.lastY + window.scrollY,
@@ -69,9 +73,9 @@ const DRAWING_STATE = {
     },
 
     mouseup: function () {
-
+        console.log('mouse up')
         strokes.isDrawing = false;
-        //strokes.strsaveStrokes();
+        strokes.saveStrokes();
     },
     mouseleave: function () {
 

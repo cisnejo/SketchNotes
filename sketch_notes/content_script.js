@@ -55,15 +55,17 @@ function spawnThings() {
 
   function resizeCanvas(CANVAS_CLASS) {
     CANVAS_CLASS.ResizeCanvas(window.innerWidth, window.innerHeight)
-    const { canvas, context } = CANVAS_CLASS
+
     CANVAS_CLASS.ClearCanvas()
 
-    const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
+    //const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
     // strokes.forEach(stroke => drawLine(context, stroke.startX, stroke.startY - window.scrollY,
     //   stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
   }
+
   function increaseCanvasSize(CANVAS_CLASS) {
+    const { canvas, context } = CANVAS_CLASS
     const { scrollY } = window
     // Set the new canvas dimensions
     CANVAS_CLASS.ScrollCanvas(scrollY)
@@ -71,9 +73,20 @@ function spawnThings() {
 
     // const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
     sketchData = strokes.getStoredStrokes()
+
     // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    strokes.forEach(stroke => stroke.drawLine(context, stroke.startX, stroke.startY - window.scrollY,
-      stroke.endX, stroke.endY - window.scrollY, stroke.color, stroke.width))
+    sketchData.strokes.forEach(stroke => {
+      stroke.startY = stroke.startY - canvas.offsetTop
+      stroke.endY = stroke.endY - canvas.offsetTop
+      strokes.drawStrokes(
+        stroke.startX,
+        stroke.startY,
+        stroke.endX,
+        stroke.endY,
+        stroke.color,
+        stroke.width)
+
+    })
 
     // for control container
     if (controlContainer.offsetTop < window.scrollY) {
