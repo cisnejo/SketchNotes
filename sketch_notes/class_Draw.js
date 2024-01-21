@@ -1,5 +1,5 @@
 
-let strokes = {
+let SKETCH_DATA = {
     localSketchData: { strokes: [], stickies: [] },
     localStrokes: [],
     isDrawing: false,
@@ -9,27 +9,34 @@ let strokes = {
     currentY: 0,
     strokeColor: '#000000',
     lineWidth: 3,
-    drawStrokes: function (startX,startY,endX,endY,strokeColor, strokeWidth) {
+    drawStrokes: function (startX, startY, endX, endY, strokeColor, strokeWidth) {
         const { context } = SKETCH_CANVAS
 
-        if (startY>= 0 && endY >= 0 && startY<= window.innerHeight && endY <= window.innerHeight) {
+        if (startY >= 0 && endY >= 0 && startY <= window.innerHeight && endY <= window.innerHeight) {
             context.beginPath();
-            context.moveTo(startX ,startY);
+            context.moveTo(startX, startY);
             context.lineTo(endX, endY);
             context.strokeStyle = strokeColor;
             context.lineWidth = strokeWidth
             context.stroke();
         }
     },
-    getStoredStrokes: function () {
-        return JSON.parse(localStorage.getItem('sketch_data'))
-    },
-    saveStrokes: function () {
+    getStoredData: function () {
+        const data = JSON.parse(localStorage.getItem('sketch_data'))
+        if (data) {
+            return data
+        }
+        else {
+            return { strokes: [], stickies: [] }
+        }
 
-        let allStrokes  = this.localStrokes.concat(this.getStoredStrokes().strokes)
+    },
+    saveData: function () {
+
+        let allStrokes = this.localStrokes.concat(this.getStoredData().strokes)
         this.localSketchData = { ...this.localSketchData, strokes: allStrokes }
 
-        localStorage.setItem('sketch_data', JSON.stringify({ ...this.getStoredStrokes(), strokes: this.localSketchData.strokes }))
+        localStorage.setItem('sketch_data', JSON.stringify({ ...this.getStoredData(), strokes: this.localSketchData.strokes }))
         this.localStrokes = []
     },
 
@@ -45,7 +52,7 @@ let strokes = {
 
 
 
-            this.drawStrokes(this.lastX,this.lastY,this.currentX,this.currentY,strokeColor, strokeWidth);
+            this.drawStrokes(this.lastX, this.lastY, this.currentX, this.currentY, strokeColor, strokeWidth);
             this.localStrokes.push({
                 startX: this.lastX,
                 startY: this.lastY + window.scrollY,
@@ -62,25 +69,24 @@ let strokes = {
 
 const DRAWING_STATE = {
     mousedown: function (e) {
-        strokes.isDrawing = true;
-        strokes.lastX = e.clientX
-        strokes.lastY = e.clientY
+        SKETCH_DATA.isDrawing = true;
+        SKETCH_DATA.lastX = e.clientX
+        SKETCH_DATA.lastY = e.clientY
 
     },
 
     mousemove: function (e) {
-        strokes.drawLine(e)
+        SKETCH_DATA.drawLine(e)
     },
 
     mouseup: function () {
-        console.log('mouse up')
-        strokes.isDrawing = false;
-        strokes.saveStrokes();
+        SKETCH_DATA.isDrawing = false;
+        SKETCH_DATA.saveData();
     },
     mouseleave: function () {
 
-        strokes.isDrawing = false;
-        //strokes.saveStrokes();
+        SKETCH_DATA.isDrawing = false;
+        //strokes.saveData();
     }
 }
 

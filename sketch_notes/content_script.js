@@ -72,13 +72,13 @@ function spawnThings() {
     CANVAS_CLASS.ClearCanvas()
 
     // const sketchData = JSON.parse(localStorage.getItem('sketch_data'));
-    sketchData = strokes.getStoredStrokes()
+    let { strokes } = SKETCH_DATA.getStoredData()
 
     // const strokes = sketchData ? sketchData.strokes ? sketchData.strokes : [] : []
-    sketchData.strokes.forEach(stroke => {
+    strokes.forEach(stroke => {
       stroke.startY = stroke.startY - canvas.offsetTop
       stroke.endY = stroke.endY - canvas.offsetTop
-      strokes.drawStrokes(
+      SKETCH_DATA.drawStrokes(
         stroke.startX,
         stroke.startY,
         stroke.endX,
